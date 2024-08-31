@@ -20,6 +20,10 @@ public class MappingController {
 		return "ok";
 	}
 
+	/**
+	 * method 특정 HTTP 메서드 요청만 허용
+	 * GET, HEAD, POST, PUT, PATCH, DELETE
+	 * */
 	@RequestMapping(value = "/mapping-get-v1", method = RequestMethod.GET)
 	public String mappingGetV1(){
 		log.info("mappingGetV1");
