@@ -1,9 +1,12 @@
 package hello.springmvc.basic.request;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,4 +24,101 @@ public class RequestParamController {
 
 		response.getWriter().write("ok");
 	}
+
+	/**
+	 * @ReqyestParam 사용
+	 * - 파라미터 이름으로 바인딩
+	 * @ResponseBody 추가
+	 * - view 조회를 무시하고 HTTP body message에 직접 해당 내용 입력
+	 */
+	// @Controller일 경우 String을 반환하면 viewResolver를 통해 view가 반환되지만 @ResponseBodu를 넣으면 HTTP body로 반환된다.
+	@ResponseBody
+	@RequestMapping("/request-param-v2")
+	public String requestParamV2(
+		@RequestParam("username") String memberName,
+			@RequestParam("age") int memberAge){
+
+		log.info("username={}, age={}", memberName, memberAge);
+
+		return "ok";
+	}
+
+	/**
+	 * @ReqyestParam 사용
+	 * HTTP 파라미터 이름이 변수 이름과 같다면 @RequestParam(name ="xxx") 생략 가능
+	 */
+	@ResponseBody
+	@RequestMapping("/request-param-v3")
+	public String requestParamV3(
+		@RequestParam String username,
+		@RequestParam int age){
+
+		log.info("username={}, age={}", username, age);
+
+		return "ok";
+	}
+
+	/**
+	 * @ReqyestParam 사용
+	 * String, int 등의 단순 타입이면 @RequestParam도 생략 가능
+	 */
+	@ResponseBody
+	@RequestMapping("/request-param-v4")
+	public String requestParamV4(String username, int age){
+
+		log.info("username={}, age={}", username, age);
+
+		return "ok";
+	}
+
+	/**
+	 * @RequestParam.required
+	 * /request-param-required -> username이 없으므로 예외 *
+	 * 주의!
+	 * /request-param-required?username= -> 빈문자로 통과 *
+	 * 주의!
+	 * /request-param-required
+	 * int age -> null을 int에 입력하는 것은 불가능, 따라서 Integer 변경해야 함(또는 다음에 나오는
+	defaultValue 사용) */
+	@ResponseBody
+	@RequestMapping("/request-param-required")
+	public String requestParamRequired(@RequestParam(required = true)  String username,
+		@RequestParam(required = false) Integer age){
+		// int 타입은 null을 가질 수 없기 때문에 Integer로 바꿔준다.
+		log.info("username={}, age={}", username, age);
+
+		return "ok";
+	}
+
+	/**
+	 * @RequestParam
+	 * - defaultValue 사용 *
+	 * 참고: defaultValue는 빈 문자의 경우에도 적용
+	 * /request-param-default?username=
+	 */
+	@ResponseBody
+	@RequestMapping("/request-param-default")
+	public String requestParamDefault(@RequestParam(defaultValue = "guest") String username,
+		@RequestParam(defaultValue = "-1") int age){
+		// 여기선 값이 안 들어오면 자동으로 -1이 되기 때문에 int로 적어도 된다.
+		log.info("username={}, age={}", username, age);
+
+		return "ok";
+	}
+
+	/**
+	 * @RequestParam Map, MultiValueMap
+	 * Map(key=value)
+	 * MultiValueMap(key=[value1, value2, ...]) ex) (key=userIds, value=[id1, id2])
+	 */
+	//  Map으로 모든 값을 꺼낼 수 있다.
+	@ResponseBody
+	@RequestMapping("/request-param-map")
+	public String requestParamMap(@RequestParam Map<String, Object> paramMap){
+
+		log.info("username={}, age={}", paramMap.get("username"), paramMap.get("age"));
+
+		return "ok";
+	}
+
 }
